@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Text from URL</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #000;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="1200" height="630"></canvas>
+    <script>
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Get text from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const text = urlParams.get('text') || 'No text provided';
+        
+        // Function to find the optimal font size
+        function findOptimalFontSize(text, maxWidth, maxHeight) {
+            let fontSize = 100; // Start with a large font size
+            ctx.font = `${fontSize}px Arial`;
+            
+            // Reduce font size until the text fits within 80% of the canvas width
+            while (ctx.measureText(text).width > maxWidth * 0.8 || fontSize > maxHeight * 0.3) {
+                fontSize -= 1;
+                ctx.font = `${fontSize}px Arial`;
+                if (fontSize < 12) break; // Minimum font size
+            }
+            
+            return fontSize;
+        }
+
+        // Calculate optimal font size
+        const optimalSize = findOptimalFontSize(text, canvas.width, canvas.height);
+        
+        // Set text properties with optimal size
+        ctx.font = `${optimalSize}px Arial`;
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Get the center coordinates of the canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        // Draw the text
+        ctx.fillText(text, centerX, centerY);
+    </script>
+</body>
+</html>
