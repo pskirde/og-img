@@ -3,63 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Text from URL</title>
+    <title>Free OpenGraph Image Generator</title>
     <style>
         body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-        canvas {
-            border: 1px solid #000;
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .byline {
+            margin-top: -15px;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        .byline a:hover {
+            color: #007bff;
+        }
+        .explanation {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .char-counter {
+            position: absolute;
+            right: 10px;
+            top: 12px;
+            color: #666;
+            font-size: 14px;
+        }
+        .result {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            word-break: break-all;
+            position: relative;
+        }
+        .copy-button {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+        .preview {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .preview img {
             max-width: 100%;
             height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: none;
+            animation: fadeIn 0.3s, fadeOut 0.3s 1.7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <canvas width="1200" height="630"></canvas>
+    <div class="container">
+        <h1>Free OpenGraph Image Generator</h1>
+        <div class="byline">
+            by <a href="https://pskirde.com" target="_blank" style="color: #666; text-decoration: none; font-size: 14px; transition: color 0.2s;">Pascal</a>
+        </div>
+        
+        <div class="explanation">
+            <h3>How it works:</h3>
+            <p>This tool generates OpenGraph images for your social media links. Here's how to use it:</p>
+            <ol>
+                <li>Enter your text in the field below (max 100 characters)</li>
+                <li>The text will automatically wrap to multiple lines if needed</li>
+                <li>Copy the generated URL and use it in your HTML meta tag like this:<br>
+                    <code>&lt;meta property="og:image" content="YOUR_URL" /&gt;</code>
+                </li>
+            </ol>
+            <p>The image will appear when your link is shared on social media platforms like Twitter, Facebook, or LinkedIn.</p>
+        </div>
+
+        <div class="input-group">
+            <input type="text" 
+                   id="textInput" 
+                   placeholder="Enter your text" 
+                   maxlength="100" 
+                   oninput="updateURL(this.value)">
+            <span class="char-counter">
+                <span id="charCount">0</span>/100
+            </span>
+        </div>
+        
+        <div class="result">
+            <strong>Generated URL:</strong>
+            <button class="copy-button" onclick="copyURL()">Copy URL</button>
+            <div id="generatedUrl" style="margin-top: 10px;"></div>
+        </div>
+        
+        <div class="preview">
+            <h3>Preview:</h3>
+            <img id="previewImage" src="" alt="Preview will appear here">
+        </div>
+    </div>
+
+    <div id="successMessage" class="success-message">
+        URL copied to clipboard!
+    </div>
+
     <script>
-        const canvas = document.querySelector('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Get text from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const text = urlParams.get('text') || 'No text provided';
-        
-        // Function to find the optimal font size
-        function findOptimalFontSize(text, maxWidth, maxHeight) {
-            let fontSize = 100; // Start with a large font size
-            ctx.font = `${fontSize}px Arial`;
-            
-            // Reduce font size until the text fits within 80% of the canvas width
-            while (ctx.measureText(text).width > maxWidth * 0.8 || fontSize > maxHeight * 0.3) {
-                fontSize -= 1;
-                ctx.font = `${fontSize}px Arial`;
-                if (fontSize < 12) break; // Minimum font size
+        function updateURL(text) {
+            if (!text) {
+                text = 'Preview Text';
             }
+            const encodedText = encodeURIComponent(text);
+            const baseUrl = window.location.origin;
+            const ogUrl = `${baseUrl}/${encodedText}/og.png`;
             
-            return fontSize;
+            document.getElementById('generatedUrl').textContent = ogUrl;
+            document.getElementById('previewImage').src = ogUrl;
+            document.getElementById('charCount').textContent = text.length;
         }
 
-        // Calculate optimal font size
-        const optimalSize = findOptimalFontSize(text, canvas.width, canvas.height);
-        
-        // Set text properties with optimal size
-        ctx.font = `${optimalSize}px Arial`;
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Get the center coordinates of the canvas
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        
-        // Draw the text
-        ctx.fillText(text, centerX, centerY);
+        function copyURL() {
+            const urlText = document.getElementById('generatedUrl').textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                const successMessage = document.getElementById('successMessage');
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            });
+        }
+
+        // Initialize with default text
+        updateURL('Preview Text');
     </script>
 </body>
 </html>
