@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free OpenGraph Image Generator</title>
+
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="Free OpenGraph Image Generator">
+    <meta name="description" content="Generate beautiful OpenGraph images for your social media links. Simple, fast, and free to use. Create images that look great when shared on Twitter, Facebook, LinkedIn, and more.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://og-img.com">
+    <meta property="og:title" content="Free OpenGraph Image Generator">
+    <meta property="og:description" content="Generate beautiful OpenGraph images for your social media links. Simple, fast, and free to use. Create images that look great when shared on Twitter, Facebook, LinkedIn, and more.">
+    <meta property="og:image" content="https://og-img.com/Free%20OpenGraph%20Image%20Generator/og.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://og-img.com">
+    <meta property="twitter:title" content="Free OpenGraph Image Generator">
+    <meta property="twitter:description" content="Generate beautiful OpenGraph images for your social media links. Simple, fast, and free to use. Create images that look great when shared on Twitter, Facebook, LinkedIn, and more.">
+    <meta property="twitter:image" content="https://og-img.com/Free%20OpenGraph%20Image%20Generator/og.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -122,7 +140,7 @@
         <div class="byline">
             by <a href="https://pskirde.com" target="_blank" style="color: #666; text-decoration: none; font-size: 14px; transition: color 0.2s;">Pascal</a>
         </div>
-        
+
         <div class="explanation">
             <h3>How it works:</h3>
             <p>This tool generates OpenGraph images for your social media links. Here's how to use it:</p>
@@ -137,22 +155,22 @@
         </div>
 
         <div class="input-group">
-            <input type="text" 
-                   id="textInput" 
-                   placeholder="Enter your text" 
-                   maxlength="100" 
+            <input type="text"
+                   id="textInput"
+                   placeholder="Enter your text"
+                   maxlength="100"
                    oninput="updateURL(this.value)">
             <span class="char-counter">
                 <span id="charCount">0</span>/100
             </span>
         </div>
-        
+
         <div class="result">
             <strong>Generated URL:</strong>
             <button class="copy-button" onclick="copyURL()">Copy URL</button>
             <div id="generatedUrl" style="margin-top: 10px;"></div>
         </div>
-        
+
         <div class="preview">
             <h3>Preview:</h3>
             <img id="previewImage" src="" alt="Preview will appear here">
@@ -171,7 +189,7 @@
             const encodedText = encodeURIComponent(text);
             const baseUrl = window.location.origin;
             const ogUrl = `${baseUrl}/${encodedText}/og.png`;
-            
+
             document.getElementById('generatedUrl').textContent = ogUrl;
             document.getElementById('previewImage').src = ogUrl;
             document.getElementById('charCount').textContent = text.length;
@@ -179,13 +197,29 @@
 
         function copyURL() {
             const urlText = document.getElementById('generatedUrl').textContent;
-            navigator.clipboard.writeText(urlText).then(() => {
+
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = urlText;
+            textarea.style.position = 'fixed';  // Avoid scrolling to bottom
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                // Try to copy
+                document.execCommand('copy');
+                // Show success message
                 const successMessage = document.getElementById('successMessage');
                 successMessage.style.display = 'block';
                 setTimeout(() => {
                     successMessage.style.display = 'none';
                 }, 2000);
-            });
+            } catch (err) {
+                console.error('Failed to copy text:', err);
+            } finally {
+                // Clean up
+                document.body.removeChild(textarea);
+            }
         }
 
         // Initialize with default text

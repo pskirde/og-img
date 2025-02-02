@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  opengraph:
+    image: opengraph
+    container_name: opengraph
+    expose:
+      - 3000
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    depends_on:
+      - opengraph
+
+volumes:
+  caddy_data:
+  caddy_config:

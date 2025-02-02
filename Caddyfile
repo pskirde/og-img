@@ -1,0 +1,24 @@
+{
+    # Email for Let's Encrypt notifications
+    email example@example.com
+}
+
+# Replace example.com with your domain
+example.com {
+    reverse_proxy opengraph:3000
+    encode gzip
+
+    # Basic security headers
+    header {
+        # Enable HTTP Strict Transport Security (HSTS)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # Disable FLoC tracking
+        Permissions-Policy "interest-cohort=()"
+        # Enable XSS protection
+        X-XSS-Protection "1; mode=block"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

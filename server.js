@@ -73,7 +73,6 @@ app.get("/:text/og.png", (req, res) => {
 
   const stream = canvas.createPNGStream();
   stream.pipe(res);
-
 });
 
 // Serve the HTML file
