@@ -30,12 +30,24 @@ Change example@example.com and example.com accordingly.
 ```bash
 docker compose up -d
 ```
-## Usage
+## Example usage
 
 You simply change the URL to whatever opengraph image you want to generate. The following url will generate the image with the text "Preview Text".
 
 ```bash
-https://og-img.com/Preview%20Text/og.png
+https://yourdomain.com/Preview%20Text/og.png
+```
+
+If you would need a text called "Please star this repository":
+
+```bash
+https://yourdomain.com/Please%20star%20this%20repository/og.png
+```
+
+You then can simply enter the images to your blog site or social media posts inside the meta tags of the html header.
+
+```bash
+<meta property="og:image" content="https://yourdomain.com/Please%20star%20this%20repository/og.png" />
 ```
 
 ## Contributing
